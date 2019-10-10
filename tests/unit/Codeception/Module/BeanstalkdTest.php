@@ -17,9 +17,10 @@ class BeanstalkdTest extends \Codeception\PHPUnit\TestCase
 
     public function _setUp()
     {
-        $this->module = new \Codeception\Module\Queue(make_container());
-            $this->module->_setConfig($this->config);
-            $this->module->_before(Stub::makeEmpty('\Codeception\TestInterface'));
+        $container = \Codeception\Util\Stub::make('Codeception\Lib\ModuleContainer');
+        $this->module = new \Codeception\Module\Queue($container);
+        $this->module->_setConfig($this->config);
+        $this->module->_before(Stub::makeEmpty('\Codeception\TestInterface'));
         try {
             $this->module->clearQueue('default');
         } catch (ConnectionException $e) {

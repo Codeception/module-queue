@@ -6,7 +6,7 @@ use Codeception\Lib\Interfaces\Queue;
 use Aws\Sqs\SqsClient;
 use Aws\Credentials\Credentials;
 
-class AmazonSQS implements Queue
+class  AmazonSQS implements Queue
 {
     protected $queue;
 
