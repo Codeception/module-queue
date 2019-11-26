@@ -25,6 +25,9 @@ abstract class QueueTest extends TestCase
             $module->clearQueue('default');
         } catch (\Throwable $t) {
             $this->markTestSkipped("Connection failed for: " . print_r($config, true));
+        } catch (\Exception $e) {
+            // This is for PHP 5.6 only, since it doesn't have a \Throwable.
+            $this->markTestSkipped("Connection failed for: " . print_r($config, true));
         }
         $module->addMessageToQueue('hello world - ' . date('d-m-y'), 'default');
         $module->clearQueue('default');
