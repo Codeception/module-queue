@@ -169,7 +169,7 @@ class Queue extends CodeceptionModule
             case 'beanstalkd':
             case 'beanstalkq':
                 // Account for different versions of Pheanstalk.
-                if (class_exists(\Pheanstalk\Contract\JobIdInterface::class)) {
+                if (interface_exists(\Pheanstalk\Contract\JobIdInterface::class)) {
                     return new Pheanstalk4();
                 } else {
                     return new Beanstalk();
