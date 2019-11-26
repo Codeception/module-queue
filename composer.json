@@ -17,7 +17,7 @@
         "codeception/codeception": "4.0.x-dev | ^4.0"
     },
     "require-dev": {
-        "pda/pheanstalk": "~3.0",
+        "pda/pheanstalk": "> 3",
         "codeception/util-robohelpers": "dev-master"
     },
     "suggest": {
