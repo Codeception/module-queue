@@ -9,7 +9,10 @@ php:
 
 # faster builds on new travis setup not using sudo
 sudo: false
-
+addons:
+  apt:
+    packages:
+      - beanstalkd
 install:
   - '[[ -z "$CI_USER_TOKEN" ]] || composer config github-oauth.github.com ${CI_USER_TOKEN};'
   - travis_retry composer self-update && composer --version
