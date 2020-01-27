@@ -25,10 +25,8 @@ abstract class QueueTest extends TestCase
             $module->clearQueue('default');
         } catch (\Throwable $t) {
             $this->markTestSkipped("Connection failed for: " . print_r($config, true));
-        } catch (\Exception $e) {
-            // This is for PHP 5.6 only, since it doesn't have a \Throwable.
-            $this->markTestSkipped("Connection failed for: " . print_r($config, true));
         }
+        $initialCount = $module->grabQueueCurrentCount('default');
         $module->addMessageToQueue('hello world - ' . date('d-m-y'), 'default');
         $module->clearQueue('default');
 
@@ -39,7 +37,7 @@ abstract class QueueTest extends TestCase
         $module->addMessageToQueue('hello world - ' . date('d-m-y'), 'default');
         $module->dontSeeEmptyQueue('default');
 
-        $module->seeQueueHasTotalCount('default', 2);
+        $module->seeQueueHasTotalCount('default', $initialCount + 2);
 
         $module->seeQueueHasCurrentCount('default', 1);
         $module->dontSeeQueueHasCurrentCount('default', 9999);
