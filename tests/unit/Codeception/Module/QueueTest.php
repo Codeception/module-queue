@@ -26,7 +26,7 @@ abstract class QueueTest extends TestCase
         } catch (\Throwable $t) {
             $this->markTestSkipped("Connection failed for: " . print_r($config, true));
         }
-        $initialCount = $module->grabQueueCurrentCount('default');
+        $initialCount = $module->grabQueueTotalCount('default');
         $module->addMessageToQueue('hello world - ' . date('d-m-y'), 'default');
         $module->clearQueue('default');
 
