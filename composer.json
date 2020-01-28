@@ -17,16 +17,19 @@
         "codeception/codeception": "4.0.x-dev | ^4.0"
     },
     "require-dev": {
-        "pda/pheanstalk": "~3.0",
+        "pda/pheanstalk": "^3.0 | ^4.0",
         "codeception/util-robohelpers": "dev-master"
     },
     "suggest": {
         "aws/aws-sdk-php": "For Amazon SQS",
-        "pda/pheanstalk": "For Beanstalkd (v4 is not supported)",
+        "pda/pheanstalk": "For Beanstalkd",
         "iron-io/iron_mq": "For Iron MQ (v4 is not supported)"
     },
     "autoload":{
         "classmap": ["src/"]
+    },
+    "autoload-dev": {
+        "classmap": ["tests/"]
     },
     "config": {
         "classmap-authoritative": true

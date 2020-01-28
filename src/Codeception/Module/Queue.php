@@ -1,6 +1,7 @@
 <?php
 namespace Codeception\Module;
 
+use Codeception\Lib\Driver\Pheanstalk4;
 use Codeception\Module as CodeceptionModule;
 use Codeception\TestInterface;
 use Codeception\Exception\ModuleConfigException;
@@ -167,7 +168,12 @@ class Queue extends CodeceptionModule
             case 'beanstalk':
             case 'beanstalkd':
             case 'beanstalkq':
-                return new Beanstalk();
+                // Account for different versions of Pheanstalk.
+                if (interface_exists(\Pheanstalk\Contract\JobIdInterface::class)) {
+                    return new Pheanstalk4();
+                } else {
+                    return new Beanstalk();
+                }
             default:
                 throw new ModuleConfigException(
                     __CLASS__,
