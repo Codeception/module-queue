@@ -24,6 +24,9 @@ jobs:
     - name: Validate composer.json and composer.lock
       run: composer validate
 
+    - name: Install beanstalkd
+      run: sudo apt install beanstalkd
+
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
 
