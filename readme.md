@@ -2,7 +2,6 @@
 
 ![Build Status](https://github.com/Codeception/module-queue/workflows/CI/badge.svg)
 
-
 ## Installation
 
 ```
