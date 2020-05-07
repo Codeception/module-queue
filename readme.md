@@ -1,6 +1,6 @@
 # Queue module for Codeception
 
-[![Build Status](https://travis-ci.org/Codeception/module-queue.svg?branch=master)](https://travis-ci.org/Codeception/module-queue)
+![Build Status](https://github.com/Codeception/module-queue/workflows/CI/badge.svg)
 
 ## Installation
 
