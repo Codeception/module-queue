@@ -10,4 +10,4 @@ composer require --dev "codeception/module-queue"
 
 ## Documentation
 
-<a href="documentation.md">Look at documentation.md file</a>
+[Module documentation](https://codeception.com/docs/modules/Queue)
