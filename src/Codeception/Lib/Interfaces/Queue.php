@@ -1,23 +1,23 @@
 <?php
+
 namespace Codeception\Lib\Interfaces;
 
 interface Queue
 {
-
     /**
      * Connect to the queueing server.
-     * @param array $config
-     * @return
+     *
+     * @return void
      */
-    public function openConnection($config);
+    public function openConnection(array $config);
 
     /**
      * Post/Put a message on to the queue server
      *
      * @param string $message Message Body to be send
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      */
-    public function addMessageToQueue($message, $queue);
+    public function addMessageToQueue(string $message, string $queue);
 
     /**
      * Return a list of queues/tubes on the queueing server
@@ -29,24 +29,32 @@ interface Queue
     /**
      * Count the current number of messages on the queue.
      *
-     * @param $queue Queue Name
-     *
+     * @param string $queue Queue name
      * @return int Count
      */
-    public function getMessagesCurrentCountOnQueue($queue);
+    public function getMessagesCurrentCountOnQueue(string $queue);
 
     /**
      * Count the total number of messages on the queue.
      *
-     * @param $queue Queue Name
-     *
+     * @param string $queue Queue name
      * @return int Count
      */
-    public function getMessagesTotalCountOnQueue($queue);
+    public function getMessagesTotalCountOnQueue(string $queue);
 
-    public function clearQueue($queue);
+    /**
+     * @param string $queue
+     * @return void
+     */
+    public function clearQueue(string $queue);
 
+    /**
+     * @return array
+     */
     public function getRequiredConfig();
 
+    /**
+     * @return array
+     */
     public function getDefaultConfig();
 }

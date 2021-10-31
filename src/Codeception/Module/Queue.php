@@ -1,13 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Module;
 
-use Codeception\Lib\Driver\Pheanstalk4;
-use Codeception\Module as CodeceptionModule;
-use Codeception\TestInterface;
 use Codeception\Exception\ModuleConfigException;
 use Codeception\Lib\Driver\AmazonSQS;
 use Codeception\Lib\Driver\Beanstalk;
 use Codeception\Lib\Driver\Iron;
+use Codeception\Lib\Driver\Pheanstalk4;
+use Codeception\Module;
+use Codeception\TestInterface;
+use Pheanstalk\Contract\JobIdInterface as PheanstalkJobIdInterface;
 
 /**
  *
@@ -18,9 +22,9 @@ use Codeception\Lib\Driver\Iron;
  *
  * Supported and tested queue types are:
  *
- * * [Iron.io](http://iron.io/)
- * * [Beanstalkd](http://kr.github.io/beanstalkd/)
- * * [Amazon SQS](http://aws.amazon.com/sqs/)
+ * * [Iron.io](https://www.iron.io/)
+ * * [Beanstalkd](https://beanstalkd.github.io/)
+ * * [Amazon SQS](https://aws.amazon.com/sqs/)
  *
  * The following dependencies are needed for the listed queue servers:
  *
@@ -65,7 +69,7 @@ use Codeception\Lib\Driver\Iron;
  *                  aws_secret_access_key = YOUR_AWS_SECRET_ACCESS_KEY
  *          - Note: Using IAM roles is the preferred technique for providing credentials
  *                  to applications running on Amazon EC2
- *                  http://docs.aws.amazon.com/aws-sdk-php/v3/guide/guide/credentials.html?highlight=credentials
+ *                  https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials.html?highlight=credentials
  *
  * * region - A region parameter is also required for AWS, refer to the AWS documentation for possible values list.
  *
@@ -123,17 +127,12 @@ use Codeception\Lib\Driver\Iron;
  *              'region': 'us-west-2'
  *
  */
-class Queue extends CodeceptionModule
+class Queue extends Module
 {
-    /**
-     * @var \Codeception\Lib\Interfaces\Queue
-     */
-    public $queueDriver;
+    public ?\Codeception\Lib\Interfaces\Queue $queueDriver = null;
 
     /**
      * Setup connection and open/setup the connection with config settings
-     *
-     * @param \Codeception\TestInterface $test
      */
     public function _before(TestInterface $test)
     {
@@ -152,10 +151,9 @@ class Queue extends CodeceptionModule
     }
 
     /**
-     * @return \Codeception\Lib\Interfaces\Queue
      * @throws ModuleConfigException
      */
-    protected function createQueueDriver()
+    protected function createQueueDriver(): \Codeception\Lib\Interfaces\Queue
     {
         switch ($this->config['type']) {
             case 'aws':
@@ -169,7 +167,7 @@ class Queue extends CodeceptionModule
             case 'beanstalkd':
             case 'beanstalkq':
                 // Account for different versions of Pheanstalk.
-                if (interface_exists(\Pheanstalk\Contract\JobIdInterface::class)) {
+                if (interface_exists(PheanstalkJobIdInterface::class)) {
                     return new Pheanstalk4();
                 } else {
                     return new Beanstalk();
@@ -190,12 +188,11 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      * $I->seeQueueExists('default');
-     * ?>
      * ```
      *
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      */
-    public function seeQueueExists($queue)
+    public function seeQueueExists(string $queue)
     {
         $this->assertContains($queue, $this->queueDriver->getQueues());
     }
@@ -206,12 +203,11 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      * $I->dontSeeQueueExists('default');
-     * ?>
      * ```
      *
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      */
-    public function dontSeeQueueExists($queue)
+    public function dontSeeQueueExists(string $queue)
     {
         $this->assertNotContains($queue, $this->queueDriver->getQueues());
     }
@@ -222,12 +218,11 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      * $I->seeEmptyQueue('default');
-     * ?>
      * ```
      *
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      */
-    public function seeEmptyQueue($queue)
+    public function seeEmptyQueue(string $queue)
     {
         $this->assertEquals(0, $this->queueDriver->getMessagesCurrentCountOnQueue($queue));
     }
@@ -238,12 +233,11 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      * $I->dontSeeEmptyQueue('default');
-     * ?>
      * ```
      *
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      */
-    public function dontSeeEmptyQueue($queue)
+    public function dontSeeEmptyQueue(string $queue)
     {
         $this->assertNotEquals(0, $this->queueDriver->getMessagesCurrentCountOnQueue($queue));
     }
@@ -254,13 +248,12 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      * $I->seeQueueHasCurrentCount('default', 10);
-     * ?>
      * ```
      *
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      * @param int $expected Number of messages expected
      */
-    public function seeQueueHasCurrentCount($queue, $expected)
+    public function seeQueueHasCurrentCount(string $queue, int $expected)
     {
         $this->assertEquals($expected, $this->queueDriver->getMessagesCurrentCountOnQueue($queue));
     }
@@ -271,13 +264,12 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      * $I->dontSeeQueueHasCurrentCount('default', 10);
-     * ?>
      * ```
      *
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      * @param int $expected Number of messages expected
      */
-    public function dontSeeQueueHasCurrentCount($queue, $expected)
+    public function dontSeeQueueHasCurrentCount(string $queue, int $expected)
     {
         $this->assertNotEquals($expected, $this->queueDriver->getMessagesCurrentCountOnQueue($queue));
     }
@@ -288,13 +280,12 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      * $I->seeQueueHasTotalCount('default', 10);
-     * ?>
      * ```
      *
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      * @param int $expected Number of messages expected
      */
-    public function seeQueueHasTotalCount($queue, $expected)
+    public function seeQueueHasTotalCount(string $queue, int $expected)
     {
         $this->assertEquals($expected, $this->queueDriver->getMessagesTotalCountOnQueue($queue));
     }
@@ -305,13 +296,12 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      * $I->dontSeeQueueHasTotalCount('default', 10);
-     * ?>
      * ```
      *
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      * @param int $expected Number of messages expected
      */
-    public function dontSeeQueueHasTotalCount($queue, $expected)
+    public function dontSeeQueueHasTotalCount(string $queue, int $expected)
     {
         $this->assertNotEquals($expected, $this->queueDriver->getMessagesTotalCountOnQueue($queue));
     }
@@ -324,13 +314,12 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      * $I->addMessageToQueue('this is a messages', 'default');
-     * ?>
      * ```
      *
      * @param string $message Message Body
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      */
-    public function addMessageToQueue($message, $queue)
+    public function addMessageToQueue(string $message, string $queue)
     {
         $this->queueDriver->addMessageToQueue($message, $queue);
     }
@@ -341,12 +330,11 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      * $I->clearQueue('default');
-     * ?>
      * ```
      *
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      */
-    public function clearQueue($queue)
+    public function clearQueue(string $queue)
     {
         $this->queueDriver->clearQueue($queue);
     }
@@ -359,7 +347,6 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      * $queues = $I->grabQueues();
-     * ?>
      * ```
      *
      * @return array List of Queues/Tubes
@@ -375,13 +362,12 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      *     $I->grabQueueCurrentCount('default');
-     * ?>
      * ```
-     * @param string $queue Queue Name
      *
+     * @param string $queue Queue name
      * @return int Count
      */
-    public function grabQueueCurrentCount($queue)
+    public function grabQueueCurrentCount(string $queue)
     {
         return $this->queueDriver->getMessagesCurrentCountOnQueue($queue);
     }
@@ -392,14 +378,12 @@ class Queue extends CodeceptionModule
      * ```php
      * <?php
      *     $I->grabQueueTotalCount('default');
-     * ?>
      * ```
      *
-     * @param $queue Queue Name
-     *
+     * @param string $queue Queue name
      * @return int Count
      */
-    public function grabQueueTotalCount($queue)
+    public function grabQueueTotalCount(string $queue)
     {
         return $this->queueDriver->getMessagesTotalCountOnQueue($queue);
     }

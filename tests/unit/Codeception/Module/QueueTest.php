@@ -1,20 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 use Codeception\Lib\ModuleContainer;
 use Codeception\Module\Queue;
-use \Codeception\PHPUnit\TestCase;
+use Codeception\PHPUnit\TestCase;
 use Codeception\TestInterface;
 use Codeception\Util\Stub;
 
 abstract class QueueTest extends TestCase
 {
-
     abstract public function configProvider();
 
     /**
      * @dataProvider configProvider
      */
-    public function testFlow($config)
+    public function testFlow($config): void
     {
         /** @var ModuleContainer $container */
         $container = Stub::make(ModuleContainer::class);
@@ -23,9 +24,10 @@ abstract class QueueTest extends TestCase
         $module->_before(Stub::makeEmpty(TestInterface::class));
         try {
             $module->clearQueue('default');
-        } catch (\Throwable $t) {
+        } catch (Throwable $throwable) {
             $this->markTestSkipped("Connection failed for: " . print_r($config, true));
         }
+
         $initialCount = $module->grabQueueTotalCount('default');
         $module->addMessageToQueue('hello world - ' . date('d-m-y'), 'default');
         $module->clearQueue('default');

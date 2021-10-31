@@ -1,8 +1,10 @@
 <?php
 
-class BeanstalkdTest extends QueueTest
+declare(strict_types=1);
+
+final class BeanstalkdTest extends QueueTest
 {
-    public function configProvider()
+    public function configProvider(): array
     {
         return [
             [[

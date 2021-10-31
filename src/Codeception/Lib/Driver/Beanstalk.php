@@ -1,19 +1,19 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Lib\Driver;
 
 use Codeception\Lib\Interfaces\Queue;
-use Pheanstalk\Pheanstalk;
 use Pheanstalk\Exception\ConnectionException;
+use Pheanstalk\Pheanstalk;
+use PHPUnit\Framework\Assert;
 
 class Beanstalk implements Queue
 {
+    protected ?Pheanstalk $queue = null;
 
-    /**
-     * @var Pheanstalk
-     */
-    protected $queue;
-
-    public function openConnection($config)
+    public function openConnection(array $config)
     {
         $this->queue = new Pheanstalk($config['host'], $config['port'], $config['timeout']);
     }
@@ -22,9 +22,9 @@ class Beanstalk implements Queue
      * Post/Put a message on to the queue server
      *
      * @param string $message Message Body to be send
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      */
-    public function addMessageToQueue($message, $queue)
+    public function addMessageToQueue(string $message, string $queue)
     {
         $this->queue->putInTube($queue, $message);
     }
@@ -32,20 +32,19 @@ class Beanstalk implements Queue
     /**
      * Count the total number of messages on the queue.
      *
-     * @param $queue Queue Name
-     *
+     * @param string $queue Queue name
      * @return int Count
      */
-    public function getMessagesTotalCountOnQueue($queue)
+    public function getMessagesTotalCountOnQueue(string $queue)
     {
         try {
             return $this->queue->statsTube($queue)['total-jobs'];
-        } catch (ConnectionException $ex) {
-            \PHPUnit\Framework\Assert::fail("queue [$queue] not found");
+        } catch (ConnectionException $connectionException) {
+            Assert::fail(sprintf('queue [%s] not found', $queue));
         }
     }
 
-    public function clearQueue($queue = 'default')
+    public function clearQueue(string $queue = 'default')
     {
         while ($job = $this->queue->reserveFromTube($queue, 0)) {
             $this->queue->delete($job);
@@ -65,16 +64,15 @@ class Beanstalk implements Queue
     /**
      * Count the current number of messages on the queue.
      *
-     * @param $queue Queue Name
-     *
+     * @param string $queue Queue name
      * @return int Count
      */
-    public function getMessagesCurrentCountOnQueue($queue)
+    public function getMessagesCurrentCountOnQueue(string $queue)
     {
         try {
             return $this->queue->statsTube($queue)['current-jobs-ready'];
         } catch (ConnectionException $e) {
-            \PHPUnit\Framework\Assert::fail("queue [$queue] not found");
+            Assert::fail(sprintf('queue [%s] not found', $queue));
         }
     }
 
