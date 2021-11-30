@@ -1,21 +1,22 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Codeception\Lib\Driver;
 
+use Aws\Credentials\Credentials;
+use Aws\Sqs\SqsClient;
 use Codeception\Exception\TestRuntimeException;
 use Codeception\Lib\Interfaces\Queue;
-use Aws\Sqs\SqsClient;
-use Aws\Credentials\Credentials;
 
 class  AmazonSQS implements Queue
 {
-    protected $queue;
+    protected ?SqsClient $queue = null;
 
     /**
      * Connect to the queueing server. (AWS, Iron.io and Beanstalkd)
-     * @param array $config
-     * @return
      */
-    public function openConnection($config)
+    public function openConnection(array $config)
     {
         $params = [
             'region' => $config['region'],
@@ -47,9 +48,9 @@ class  AmazonSQS implements Queue
      * Post/Put a message on to the queue server
      *
      * @param string $message Message Body to be send
-     * @param string $queue Queue Name
+     * @param string $queue Queue name
      */
-    public function addMessageToQueue($message, $queue)
+    public function addMessageToQueue(string $message, string $queue)
     {
         $this->queue->sendMessage([
             'QueueUrl' => $this->getQueueURL($queue),
@@ -68,19 +69,19 @@ class  AmazonSQS implements Queue
         $queues = $this->queue->listQueues(['QueueNamePrefix' => ''])->get('QueueUrls');
         foreach ($queues as $queue) {
             $tokens = explode('/', $queue);
-            $queueNames[] = $tokens[sizeof($tokens) - 1];
+            $queueNames[] = $tokens[count($tokens) - 1];
         }
+
         return $queueNames;
     }
 
     /**
      * Count the current number of messages on the queue.
      *
-     * @param $queue Queue Name
-     *
+     * @param string $queue Queue name
      * @return int Count
      */
-    public function getMessagesCurrentCountOnQueue($queue)
+    public function getMessagesCurrentCountOnQueue(string $queue)
     {
         return $this->queue->getQueueAttributes([
             'QueueUrl' => $this->getQueueURL($queue),
@@ -91,11 +92,10 @@ class  AmazonSQS implements Queue
     /**
      * Count the total number of messages on the queue.
      *
-     * @param $queue Queue Name
-     *
+     * @param string $queue Queue name
      * @return int Count
      */
-    public function getMessagesTotalCountOnQueue($queue)
+    public function getMessagesTotalCountOnQueue(string $queue)
     {
         return $this->queue->getQueueAttributes([
             'QueueUrl' => $this->getQueueURL($queue),
@@ -103,7 +103,7 @@ class  AmazonSQS implements Queue
         ])->get('Attributes')['ApproximateNumberOfMessages'];
     }
 
-    public function clearQueue($queue)
+    public function clearQueue(string $queue)
     {
         $queueURL = $this->getQueueURL($queue);
         while (true) {
@@ -112,6 +112,7 @@ class  AmazonSQS implements Queue
             if (!$res->getPath('Messages')) {
                 return;
             }
+
             foreach ($res->getPath('Messages') as $msg) {
                 $this->queue->deleteMessage([
                     'QueueUrl' => $queueURL,
@@ -124,19 +125,19 @@ class  AmazonSQS implements Queue
     /**
      * Get the queue/tube URL from the queue name (AWS function only)
      *
-     * @param $queue Queue Name
-     *
+     * @param string $queue Queue name
      * @return string Queue URL
      */
-    private function getQueueURL($queue)
+    private function getQueueURL(string $queue)
     {
         $queues = $this->queue->listQueues(['QueueNamePrefix' => ''])->get('QueueUrls');
         foreach ($queues as $queueURL) {
             $tokens = explode('/', $queueURL);
-            if (strtolower($queue) == strtolower($tokens[sizeof($tokens) - 1])) {
+            if (strtolower($queue) === strtolower($tokens[count($tokens) - 1])) {
                 return $queueURL;
             }
         }
+
         throw new TestRuntimeException('queue [' . $queue . '] not found');
     }
 
