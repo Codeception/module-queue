@@ -16,35 +16,31 @@ class Iron implements Queue
     /**
      * Connect to the queueing server. (AWS, Iron.io and Beanstalkd)
      */
-    public function openConnection(array $config)
+    public function openConnection(array $config): void
     {
         $this->queue = new IronMQ([
             "token"      => $config['token'],
             "project_id" => $config['project'],
             "host"       => $config['host']
         ]);
-        if (!$this->queue) {
-            Assert::fail('connection failed or timed-out.');
-        }
     }
 
     /**
      * Post/Put a message on to the queue server
      *
      * @param string $message Message Body to be send
-     * @param string $queue Queue name
      */
-    public function addMessageToQueue(string $message, string $queue)
+    public function addMessageToQueue(string $message, string $queueName): void
     {
-        $this->queue->postMessage($queue, $message);
+        $this->queue->postMessage($queueName, $message);
     }
 
     /**
      * Return a list of queues/tubes on the queueing server
      *
-     * @return array Array of Queues
+     * @return string[] Array of Queues
      */
-    public function getQueues()
+    public function getQueues(): array
     {
         // Format the output to suit
         $queues = [];
@@ -56,49 +52,49 @@ class Iron implements Queue
 
     /**
      * Count the current number of messages on the queue.
-     *
-     * @param string $queue Queue name
-     * @return int Count
      */
-    public function getMessagesCurrentCountOnQueue(string $queue)
+    public function getMessagesCurrentCountOnQueue(string $queueName): int
     {
         try {
-            return $this->queue->getQueue($queue)->size;
+            return (int)$this->queue->getQueue($queueName)->size;
         } catch (Http_Exception $ex) {
-            Assert::fail("queue [$queue] not found");
+            Assert::fail("queue [$queueName] not found");
         }
     }
 
     /**
      * Count the total number of messages on the queue.
-     *
-     * @param string $queue Queue name
-     * @return int Count
      */
-    public function getMessagesTotalCountOnQueue(string $queue)
+    public function getMessagesTotalCountOnQueue(string $queueName): int
     {
         try {
-            return $this->queue->getQueue($queue)->total_messages;
+            return (int)$this->queue->getQueue($queueName)->total_messages;
         } catch (Http_Exception $e) {
-            Assert::fail("queue [$queue] not found");
+            Assert::fail("queue [$queueName] not found");
         }
     }
 
-    public function clearQueue(string $queue)
+    public function clearQueue(string $queueName): void
     {
         try {
-            $this->queue->clearQueue($queue);
+            $this->queue->clearQueue($queueName);
         } catch (Http_Exception $ex) {
-            Assert::fail("queue [$queue] not found");
+            Assert::fail("queue [$queueName] not found");
         }
     }
 
-    public function getRequiredConfig()
+    /**
+     * @return string[]
+     */
+    public function getRequiredConfig(): array
     {
         return ['host', 'token', 'project'];
     }
 
-    public function getDefaultConfig()
+    /**
+     * @return array<string, mixed>
+     */
+    public function getDefaultConfig(): array
     {
         return [];
     }

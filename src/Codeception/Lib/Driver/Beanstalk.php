@@ -13,7 +13,10 @@ class Beanstalk implements Queue
 {
     protected ?Pheanstalk $queue = null;
 
-    public function openConnection(array $config)
+    /**
+     * @param array<string, mixed> $config
+     */
+    public function openConnection(array $config): void
     {
         $this->queue = new Pheanstalk($config['host'], $config['port'], $config['timeout']);
     }
@@ -22,31 +25,27 @@ class Beanstalk implements Queue
      * Post/Put a message on to the queue server
      *
      * @param string $message Message Body to be send
-     * @param string $queue Queue name
      */
-    public function addMessageToQueue(string $message, string $queue)
+    public function addMessageToQueue(string $message, string $queueName): void
     {
-        $this->queue->putInTube($queue, $message);
+        $this->queue->putInTube($queueName, $message);
     }
 
     /**
      * Count the total number of messages on the queue.
-     *
-     * @param string $queue Queue name
-     * @return int Count
      */
-    public function getMessagesTotalCountOnQueue(string $queue)
+    public function getMessagesTotalCountOnQueue(string $queueName): int
     {
         try {
-            return $this->queue->statsTube($queue)['total-jobs'];
+            return (int)$this->queue->statsTube($queueName)['total-jobs'];
         } catch (ConnectionException $connectionException) {
-            Assert::fail(sprintf('queue [%s] not found', $queue));
+            Assert::fail(sprintf('queue [%s] not found', $queueName));
         }
     }
 
-    public function clearQueue(string $queue = 'default')
+    public function clearQueue(string $queueName = 'default'): void
     {
-        while ($job = $this->queue->reserveFromTube($queue, 0)) {
+        while ($job = $this->queue->reserveFromTube($queueName, 0)) {
             $this->queue->delete($job);
         }
     }
@@ -54,34 +53,37 @@ class Beanstalk implements Queue
     /**
      * Return a list of queues/tubes on the queueing server
      *
-     * @return array Array of Queues
+     * @return string[] Array of Queues
      */
-    public function getQueues()
+    public function getQueues(): array
     {
         return $this->queue->listTubes();
     }
 
     /**
      * Count the current number of messages on the queue.
-     *
-     * @param string $queue Queue name
-     * @return int Count
      */
-    public function getMessagesCurrentCountOnQueue(string $queue)
+    public function getMessagesCurrentCountOnQueue(string $queueName): int
     {
         try {
-            return $this->queue->statsTube($queue)['current-jobs-ready'];
+            return (int)$this->queue->statsTube($queueName)['current-jobs-ready'];
         } catch (ConnectionException $e) {
-            Assert::fail(sprintf('queue [%s] not found', $queue));
+            Assert::fail(sprintf('queue [%s] not found', $queueName));
         }
     }
 
-    public function getRequiredConfig()
+    /**
+     * @return string[]
+     */
+    public function getRequiredConfig(): array
     {
         return ['host'];
     }
 
-    public function getDefaultConfig()
+    /**
+     * @return array<string, mixed>
+     */
+    public function getDefaultConfig(): array
     {
         return ['port' => 11300, 'timeout' => 90];
     }

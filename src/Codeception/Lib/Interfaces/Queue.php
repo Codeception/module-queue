@@ -7,54 +7,43 @@ interface Queue
     /**
      * Connect to the queueing server.
      *
-     * @return void
+     * @param array<string, mixed> $config
      */
-    public function openConnection(array $config);
+    public function openConnection(array $config): void;
 
     /**
      * Post/Put a message on to the queue server
      *
      * @param string $message Message Body to be send
-     * @param string $queue Queue name
      */
-    public function addMessageToQueue(string $message, string $queue);
-
+    public function addMessageToQueue(string $message, string $queueName): void;
+    
     /**
      * Return a list of queues/tubes on the queueing server
      *
-     * @return array Array of Queues
+     * @return string[] Array of Queues
      */
-    public function getQueues();
+    public function getQueues(): array;
 
     /**
      * Count the current number of messages on the queue.
-     *
-     * @param string $queue Queue name
-     * @return int Count
      */
-    public function getMessagesCurrentCountOnQueue(string $queue);
+    public function getMessagesCurrentCountOnQueue(string $queueName): int;
 
     /**
      * Count the total number of messages on the queue.
-     *
-     * @param string $queue Queue name
-     * @return int Count
      */
-    public function getMessagesTotalCountOnQueue(string $queue);
+    public function getMessagesTotalCountOnQueue(string $queueName): int;
+
+    public function clearQueue(string $queueName): void;
 
     /**
-     * @param string $queue
-     * @return void
+     * @return string[]
      */
-    public function clearQueue(string $queue);
+    public function getRequiredConfig(): array;
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getRequiredConfig();
-
-    /**
-     * @return array
-     */
-    public function getDefaultConfig();
+    public function getDefaultConfig(): array;
 }

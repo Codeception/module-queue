@@ -13,55 +13,59 @@ class Pheanstalk4 implements Queue
     protected ?Pheanstalk $queue = null;
 
     /**
-     * @inheritDoc
+     * Connect to the queueing server.
      */
-    public function openConnection(array $config)
+    public function openConnection(array $config): void
     {
         $this->queue = Pheanstalk::create($config['host'], $config['port'], $config['timeout']);
     }
 
     /**
-     * @inheritDoc
+     * Post/Put a message on to the queue server
+     *
+     * @param string $message Message Body to be send
      */
-    public function addMessageToQueue(string $message, string $queue)
+    public function addMessageToQueue(string $message, string $queueName): void
     {
-        $this->queue->useTube($queue);
+        $this->queue->useTube($queueName);
         $this->queue->put($message);
     }
 
     /**
-     * @inheritDoc
+     * Return a list of queues/tubes on the queueing server
+     *
+     * @return string[] Array of Queues
      */
-    public function getQueues()
+    public function getQueues(): array
     {
         return $this->queue->listTubes();
     }
 
     /**
-     * @inheritDoc
+     * Count the current number of messages on the queue.
      */
-    public function getMessagesCurrentCountOnQueue(string $queue)
+    public function getMessagesCurrentCountOnQueue(string $queueName): int
     {
-        $response = $this->queue->statsTube($queue);
+        $response = $this->queue->statsTube($queueName);
         return $response->getResponseName() !== ResponseInterface::RESPONSE_NOT_FOUND
-            ? $response['current-jobs-ready']
+            ? (int)$response['current-jobs-ready']
             : 0;
     }
 
     /**
-     * @inheritDoc
+     * Count the total number of messages on the queue.
      */
-    public function getMessagesTotalCountOnQueue(string $queue)
+    public function getMessagesTotalCountOnQueue(string $queueName): int
     {
-        $response = $this->queue->statsTube($queue);
+        $response = $this->queue->statsTube($queueName);
         return $response->getResponseName() !== ResponseInterface::RESPONSE_NOT_FOUND
-            ? $response['total-jobs']
+            ? (int)$response['total-jobs']
             : 0;
     }
 
-    public function clearQueue(string $queue)
+    public function clearQueue(string $queueName): void
     {
-        $this->queue->useTube($queue);
+        $this->queue->useTube($queueName);
         while (null !== $job = $this->queue->peekBuried()) {
             $this->queue->delete($job);
         }
@@ -75,12 +79,18 @@ class Pheanstalk4 implements Queue
         }
     }
 
-    public function getRequiredConfig()
+    /**
+     * @return string[]
+     */
+    public function getRequiredConfig(): array
     {
         return [];
     }
 
-    public function getDefaultConfig()
+    /**
+     * @return array<string, mixed>
+     */
+    public function getDefaultConfig(): array
     {
         return ['port' => 11300, 'timeout' => 90, 'host' => 'localhost'];
     }

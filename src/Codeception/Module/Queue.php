@@ -134,7 +134,7 @@ class Queue extends Module
     /**
      * Setup connection and open/setup the connection with config settings
      */
-    public function _before(TestInterface $test)
+    public function _before(TestInterface $test): void
     {
         $this->queueDriver->openConnection($this->config);
     }
@@ -142,7 +142,7 @@ class Queue extends Module
     /**
      * Provide and override for the config settings and allow custom settings depending on the service being used.
      */
-    protected function validateConfig()
+    protected function validateConfig(): void
     {
         $this->queueDriver = $this->createQueueDriver();
         $this->requiredFields = $this->queueDriver->getRequiredConfig();
@@ -175,7 +175,7 @@ class Queue extends Module
             default:
                 throw new ModuleConfigException(
                     __CLASS__,
-                    "Unknown queue type {$this->config}; Supported queue types are: aws, iron, beanstalk"
+                    "Unknown queue type {$this->config['type']}; Supported queue types are: aws, iron, beanstalk"
                 );
         }
     }
@@ -192,7 +192,7 @@ class Queue extends Module
      *
      * @param string $queue Queue name
      */
-    public function seeQueueExists(string $queue)
+    public function seeQueueExists(string $queue): void
     {
         $this->assertContains($queue, $this->queueDriver->getQueues());
     }
@@ -207,7 +207,7 @@ class Queue extends Module
      *
      * @param string $queue Queue name
      */
-    public function dontSeeQueueExists(string $queue)
+    public function dontSeeQueueExists(string $queue): void
     {
         $this->assertNotContains($queue, $this->queueDriver->getQueues());
     }
@@ -222,7 +222,7 @@ class Queue extends Module
      *
      * @param string $queue Queue name
      */
-    public function seeEmptyQueue(string $queue)
+    public function seeEmptyQueue(string $queue): void
     {
         $this->assertEquals(0, $this->queueDriver->getMessagesCurrentCountOnQueue($queue));
     }
@@ -237,7 +237,7 @@ class Queue extends Module
      *
      * @param string $queue Queue name
      */
-    public function dontSeeEmptyQueue(string $queue)
+    public function dontSeeEmptyQueue(string $queue): void
     {
         $this->assertNotEquals(0, $this->queueDriver->getMessagesCurrentCountOnQueue($queue));
     }
@@ -253,7 +253,7 @@ class Queue extends Module
      * @param string $queue Queue name
      * @param int $expected Number of messages expected
      */
-    public function seeQueueHasCurrentCount(string $queue, int $expected)
+    public function seeQueueHasCurrentCount(string $queue, int $expected): void
     {
         $this->assertEquals($expected, $this->queueDriver->getMessagesCurrentCountOnQueue($queue));
     }
@@ -269,7 +269,7 @@ class Queue extends Module
      * @param string $queue Queue name
      * @param int $expected Number of messages expected
      */
-    public function dontSeeQueueHasCurrentCount(string $queue, int $expected)
+    public function dontSeeQueueHasCurrentCount(string $queue, int $expected): void
     {
         $this->assertNotEquals($expected, $this->queueDriver->getMessagesCurrentCountOnQueue($queue));
     }
@@ -285,7 +285,7 @@ class Queue extends Module
      * @param string $queue Queue name
      * @param int $expected Number of messages expected
      */
-    public function seeQueueHasTotalCount(string $queue, int $expected)
+    public function seeQueueHasTotalCount(string $queue, int $expected): void
     {
         $this->assertEquals($expected, $this->queueDriver->getMessagesTotalCountOnQueue($queue));
     }
@@ -301,7 +301,7 @@ class Queue extends Module
      * @param string $queue Queue name
      * @param int $expected Number of messages expected
      */
-    public function dontSeeQueueHasTotalCount(string $queue, int $expected)
+    public function dontSeeQueueHasTotalCount(string $queue, int $expected): void
     {
         $this->assertNotEquals($expected, $this->queueDriver->getMessagesTotalCountOnQueue($queue));
     }
@@ -319,7 +319,7 @@ class Queue extends Module
      * @param string $message Message Body
      * @param string $queue Queue name
      */
-    public function addMessageToQueue(string $message, string $queue)
+    public function addMessageToQueue(string $message, string $queue): void
     {
         $this->queueDriver->addMessageToQueue($message, $queue);
     }
@@ -334,7 +334,7 @@ class Queue extends Module
      *
      * @param string $queue Queue name
      */
-    public function clearQueue(string $queue)
+    public function clearQueue(string $queue): void
     {
         $this->queueDriver->clearQueue($queue);
     }
@@ -349,9 +349,9 @@ class Queue extends Module
      * $queues = $I->grabQueues();
      * ```
      *
-     * @return array List of Queues/Tubes
+     * @return string[] List of Queues/Tubes
      */
-    public function grabQueues()
+    public function grabQueues(): array
     {
         return $this->queueDriver->getQueues();
     }

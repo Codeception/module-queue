@@ -14,9 +14,9 @@ class  AmazonSQS implements Queue
     protected ?SqsClient $queue = null;
 
     /**
-     * Connect to the queueing server. (AWS, Iron.io and Beanstalkd)
+     * Connect to the queueing server.
      */
-    public function openConnection(array $config)
+    public function openConnection(array $config): void
     {
         $params = [
             'region' => $config['region'],
@@ -39,21 +39,17 @@ class  AmazonSQS implements Queue
         }
 
         $this->queue = new SqsClient($params);
-        if (!$this->queue) {
-            throw new TestRuntimeException('connection failed or timed-out.');
-        }
     }
 
     /**
      * Post/Put a message on to the queue server
      *
      * @param string $message Message Body to be send
-     * @param string $queue Queue name
      */
-    public function addMessageToQueue(string $message, string $queue)
+    public function addMessageToQueue(string $message, string $queueName): void
     {
         $this->queue->sendMessage([
-            'QueueUrl' => $this->getQueueURL($queue),
+            'QueueUrl' => $this->getQueueURL($queueName),
             'MessageBody' => $message,
         ]);
     }
@@ -61,9 +57,9 @@ class  AmazonSQS implements Queue
     /**
      * Return a list of queues/tubes on the queueing server
      *
-     * @return array Array of Queues
+     * @return string[] Array of Queues
      */
-    public function getQueues()
+    public function getQueues(): array
     {
         $queueNames = [];
         $queues = $this->queue->listQueues(['QueueNamePrefix' => ''])->get('QueueUrls');
@@ -77,35 +73,29 @@ class  AmazonSQS implements Queue
 
     /**
      * Count the current number of messages on the queue.
-     *
-     * @param string $queue Queue name
-     * @return int Count
      */
-    public function getMessagesCurrentCountOnQueue(string $queue)
+    public function getMessagesCurrentCountOnQueue(string $queueName): int
     {
-        return $this->queue->getQueueAttributes([
-            'QueueUrl' => $this->getQueueURL($queue),
+        return (int)$this->queue->getQueueAttributes([
+            'QueueUrl' => $this->getQueueURL($queueName),
             'AttributeNames' => ['ApproximateNumberOfMessages'],
         ])->get('Attributes')['ApproximateNumberOfMessages'];
     }
 
     /**
      * Count the total number of messages on the queue.
-     *
-     * @param string $queue Queue name
-     * @return int Count
      */
-    public function getMessagesTotalCountOnQueue(string $queue)
+    public function getMessagesTotalCountOnQueue(string $queueName): int
     {
-        return $this->queue->getQueueAttributes([
-            'QueueUrl' => $this->getQueueURL($queue),
+        return (int)$this->queue->getQueueAttributes([
+            'QueueUrl' => $this->getQueueURL($queueName),
             'AttributeNames' => ['ApproximateNumberOfMessages'],
         ])->get('Attributes')['ApproximateNumberOfMessages'];
     }
 
-    public function clearQueue(string $queue)
+    public function clearQueue(string $queueName): void
     {
-        $queueURL = $this->getQueueURL($queue);
+        $queueURL = $this->getQueueURL($queueName);
         while (true) {
             $res = $this->queue->receiveMessage(['QueueUrl' => $queueURL]);
 
@@ -124,29 +114,32 @@ class  AmazonSQS implements Queue
 
     /**
      * Get the queue/tube URL from the queue name (AWS function only)
-     *
-     * @param string $queue Queue name
-     * @return string Queue URL
      */
-    private function getQueueURL(string $queue)
+    private function getQueueURL(string $queueName): string
     {
         $queues = $this->queue->listQueues(['QueueNamePrefix' => ''])->get('QueueUrls');
         foreach ($queues as $queueURL) {
             $tokens = explode('/', $queueURL);
-            if (strtolower($queue) === strtolower($tokens[count($tokens) - 1])) {
+            if (strtolower($queueName) === strtolower($tokens[count($tokens) - 1])) {
                 return $queueURL;
             }
         }
 
-        throw new TestRuntimeException('queue [' . $queue . '] not found');
+        throw new TestRuntimeException('queue [' . $queueName . '] not found');
     }
 
-    public function getRequiredConfig()
+    /**
+     * @return string[]
+     */
+    public function getRequiredConfig(): array
     {
         return ['region'];
     }
 
-    public function getDefaultConfig()
+    /**
+     * @return array<string, mixed>
+     */
+    public function getDefaultConfig(): array
     {
         return [];
     }
