@@ -14,7 +14,6 @@ use Codeception\TestInterface;
 use Pheanstalk\Contract\JobIdInterface as PheanstalkJobIdInterface;
 
 /**
- *
  * Works with Queue servers.
  *
  * Testing with a selection of remote/local queueing services, including Amazon's SQS service
@@ -125,7 +124,6 @@ use Pheanstalk\Contract\JobIdInterface as PheanstalkJobIdInterface;
  *           Queue:
  *              'type': 'aws',
  *              'region': 'us-west-2'
- *
  */
 class Queue extends Module
 {
@@ -156,27 +154,27 @@ class Queue extends Module
     protected function createQueueDriver(): \Codeception\Lib\Interfaces\Queue
     {
         switch ($this->config['type']) {
-            case 'aws':
-            case 'sqs':
-            case 'aws_sqs':
-                return new AmazonSQS();
-            case 'iron':
-            case 'iron_mq':
-                return new Iron();
-            case 'beanstalk':
-            case 'beanstalkd':
-            case 'beanstalkq':
-                // Account for different versions of Pheanstalk.
-                if (interface_exists(PheanstalkJobIdInterface::class)) {
-                    return new Pheanstalk4();
-                } else {
-                    return new Beanstalk();
-                }
-            default:
-                throw new ModuleConfigException(
-                    __CLASS__,
-                    "Unknown queue type {$this->config['type']}; Supported queue types are: aws, iron, beanstalk"
-                );
+        case 'aws':
+        case 'sqs':
+        case 'aws_sqs':
+            return new AmazonSQS();
+        case 'iron':
+        case 'iron_mq':
+            return new Iron();
+        case 'beanstalk':
+        case 'beanstalkd':
+        case 'beanstalkq':
+            // Account for different versions of Pheanstalk.
+            if (interface_exists(PheanstalkJobIdInterface::class)) {
+                return new Pheanstalk4();
+            } else {
+                return new Beanstalk();
+            }
+        default:
+            throw new ModuleConfigException(
+                __CLASS__,
+                "Unknown queue type {$this->config['type']}; Supported queue types are: aws, iron, beanstalk"
+            );
         }
     }
 
@@ -250,8 +248,8 @@ class Queue extends Module
      * $I->seeQueueHasCurrentCount('default', 10);
      * ```
      *
-     * @param string $queue Queue name
-     * @param int $expected Number of messages expected
+     * @param string $queue    Queue name
+     * @param int    $expected Number of messages expected
      */
     public function seeQueueHasCurrentCount(string $queue, int $expected): void
     {
@@ -266,8 +264,8 @@ class Queue extends Module
      * $I->dontSeeQueueHasCurrentCount('default', 10);
      * ```
      *
-     * @param string $queue Queue name
-     * @param int $expected Number of messages expected
+     * @param string $queue    Queue name
+     * @param int    $expected Number of messages expected
      */
     public function dontSeeQueueHasCurrentCount(string $queue, int $expected): void
     {
@@ -282,8 +280,8 @@ class Queue extends Module
      * $I->seeQueueHasTotalCount('default', 10);
      * ```
      *
-     * @param string $queue Queue name
-     * @param int $expected Number of messages expected
+     * @param string $queue    Queue name
+     * @param int    $expected Number of messages expected
      */
     public function seeQueueHasTotalCount(string $queue, int $expected): void
     {
@@ -298,8 +296,8 @@ class Queue extends Module
      * $I->dontSeeQueueHasTotalCount('default', 10);
      * ```
      *
-     * @param string $queue Queue name
-     * @param int $expected Number of messages expected
+     * @param string $queue    Queue name
+     * @param int    $expected Number of messages expected
      */
     public function dontSeeQueueHasTotalCount(string $queue, int $expected): void
     {
@@ -317,7 +315,7 @@ class Queue extends Module
      * ```
      *
      * @param string $message Message Body
-     * @param string $queue Queue name
+     * @param string $queue   Queue name
      */
     public function addMessageToQueue(string $message, string $queue): void
     {
@@ -364,7 +362,7 @@ class Queue extends Module
      *     $I->grabQueueCurrentCount('default');
      * ```
      *
-     * @param string $queue Queue name
+     * @param  string $queue Queue name
      * @return int Count
      */
     public function grabQueueCurrentCount(string $queue)
@@ -380,7 +378,7 @@ class Queue extends Module
      *     $I->grabQueueTotalCount('default');
      * ```
      *
-     * @param string $queue Queue name
+     * @param  string $queue Queue name
      * @return int Count
      */
     public function grabQueueTotalCount(string $queue)

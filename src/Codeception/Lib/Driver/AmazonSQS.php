@@ -48,10 +48,12 @@ class  AmazonSQS implements Queue
      */
     public function addMessageToQueue(string $message, string $queueName): void
     {
-        $this->queue->sendMessage([
+        $this->queue->sendMessage(
+            [
             'QueueUrl' => $this->getQueueURL($queueName),
             'MessageBody' => $message,
-        ]);
+            ]
+        );
     }
 
     /**
@@ -76,10 +78,12 @@ class  AmazonSQS implements Queue
      */
     public function getMessagesCurrentCountOnQueue(string $queueName): int
     {
-        return (int)$this->queue->getQueueAttributes([
-            'QueueUrl' => $this->getQueueURL($queueName),
-            'AttributeNames' => ['ApproximateNumberOfMessages'],
-        ])->get('Attributes')['ApproximateNumberOfMessages'];
+        return (int)$this->queue->getQueueAttributes(
+            [
+                'QueueUrl' => $this->getQueueURL($queueName),
+                'AttributeNames' => ['ApproximateNumberOfMessages'],
+            ]
+        )->get('Attributes')['ApproximateNumberOfMessages'];
     }
 
     /**
@@ -87,10 +91,12 @@ class  AmazonSQS implements Queue
      */
     public function getMessagesTotalCountOnQueue(string $queueName): int
     {
-        return (int)$this->queue->getQueueAttributes([
-            'QueueUrl' => $this->getQueueURL($queueName),
-            'AttributeNames' => ['ApproximateNumberOfMessages'],
-        ])->get('Attributes')['ApproximateNumberOfMessages'];
+        return (int)$this->queue->getQueueAttributes(
+            [
+                'QueueUrl' => $this->getQueueURL($queueName),
+                'AttributeNames' => ['ApproximateNumberOfMessages'],
+            ]
+        )->get('Attributes')['ApproximateNumberOfMessages'];
     }
 
     public function clearQueue(string $queueName): void
@@ -104,10 +110,12 @@ class  AmazonSQS implements Queue
             }
 
             foreach ($res->getPath('Messages') as $msg) {
-                $this->queue->deleteMessage([
-                    'QueueUrl' => $queueURL,
-                    'ReceiptHandle' => $msg['ReceiptHandle']
-                ]);
+                $this->queue->deleteMessage(
+                    [
+                        'QueueUrl' => $queueURL,
+                        'ReceiptHandle' => $msg['ReceiptHandle']
+                    ]
+                );
             }
         }
     }

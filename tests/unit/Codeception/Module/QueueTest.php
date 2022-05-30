@@ -17,7 +17,9 @@ abstract class QueueTest extends TestCase
      */
     public function testFlow($config): void
     {
-        /** @var ModuleContainer $container */
+        /**
+ * @var ModuleContainer $container 
+*/
         $container = Stub::make(ModuleContainer::class);
         $module = new Queue($container);
         $module->_setConfig($config);

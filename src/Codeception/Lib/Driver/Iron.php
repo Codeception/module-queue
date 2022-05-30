@@ -18,11 +18,13 @@ class Iron implements Queue
      */
     public function openConnection(array $config): void
     {
-        $this->queue = new IronMQ([
-            "token"      => $config['token'],
-            "project_id" => $config['project'],
-            "host"       => $config['host']
-        ]);
+        $this->queue = new IronMQ(
+            [
+                "token"      => $config['token'],
+                "project_id" => $config['project'],
+                "host"       => $config['host']
+            ]
+        );
     }
 
     /**
