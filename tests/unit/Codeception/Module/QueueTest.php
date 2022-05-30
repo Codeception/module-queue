@@ -6,7 +6,7 @@ use Codeception\Lib\ModuleContainer;
 use Codeception\Module\Queue;
 use Codeception\PHPUnit\TestCase;
 use Codeception\TestInterface;
-use Codeception\Util\Stub;
+use Codeception\Stub;
 
 abstract class QueueTest extends TestCase
 {
